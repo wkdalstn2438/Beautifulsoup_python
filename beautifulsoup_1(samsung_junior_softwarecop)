@@ -1,8 +1,12 @@
 import requests
+import streamlit as st
 from bs4 import BeautifulSoup
+import webbrowser
 
 url = "https://www.juniorsoftwarecup.com/Awards"
 respones = requests.get(url)
+
+
 
 if respones.status_code == 200:
     print("Success")
@@ -10,17 +14,33 @@ if respones.status_code == 200:
     soup = BeautifulSoup(source, 'html.parser')
 
     ex = soup.findAll("h1", {"class":"tit"})
-    print("ex", ex)
-    print("before", soup.findAll('div'))
+
     top_list = soup.findAll("div", {"class":"tit"})
-    print("top list", top_list)
+
     p = soup.find_all('p')
     top_list = soup.find_all(attrs={'class':'tit'})
 
     index = -1
+    st.title("삼성주니어 sw대회 수상작")
+    a = ''
     for i in top_list:
+        if index == 1:
+            a = "대상"
+        elif index > 1 and index < 5:
+            a = "최우수상"
+        else:
+            a = '우수상'
         if index > 0:
             print(index, i.text.strip())
-        index += 1
 
+            st.subheader("{}: {}".format(a, i.text.strip()))
+            url = ("https://www.juniorsoftwarecup.com/Awards/Detail/{}?pageidx=1&dtlGbn=2021".format(371 - index+1))
+            if st.button("{}".format(i.text.strip())):
+                webbrowser.open_new_tab(url)
+        index += 1
+        if index == 11:
+            break
     soup.find_all(['h1', 'p'])
+
+
+
